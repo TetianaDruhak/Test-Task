@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">SweetTV Test Task</string>
+    <string name="no_internet_connection">No Internet connection</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="title_activity_video_player">VideoPlayerActivity</string>
+    <string name="please_choose_category">Please choose category</string>
+    <string name="choose_video_from">Choose video from </string>
+</resources>

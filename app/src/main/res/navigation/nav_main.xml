@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_main"
+    app:startDestination="@id/chooseCategoryFragment">
+
+    <fragment
+        android:id="@+id/chooseCategoryFragment"
+        android:name="com.my.sweettvtesttask.presentation.chooseCategory.ChooseCategoryFragment">
+
+        <action
+            android:id="@+id/action_chooseCategory_to_chooseVideo"
+            app:destination="@+id/chooseVideoFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/chooseVideoFragment"
+        android:name="com.my.sweettvtesttask.presentation.chooseVideo.ChooseVideoFragment">
+
+        <argument
+            android:name="categoryAlias"
+            app:argType="string"
+            app:nullable="false" />
+        <argument
+            android:name="categoryName"
+            app:argType="string"
+            app:nullable="false" />
+
+        <action
+            android:id="@+id/action_chooseVideo_to_videoPlayer"
+            app:destination="@+id/videoPlayerActivity" />
+
+    </fragment>
+
+    <activity
+        android:id="@+id/videoPlayerActivity"
+        android:name="com.my.sweettvtesttask.presentation.videoPlayer.VideoPlayerActivity">
+
+    </activity>
+
+</navigation>
