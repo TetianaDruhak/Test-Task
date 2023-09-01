@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:background="?selectableItemBackground"
     android:clickable="true"
+    android:textColor="@color/white"
     android:focusable="true"
     android:paddingHorizontal="@dimen/standard_space"
     android:paddingVertical="@dimen/standard_space"

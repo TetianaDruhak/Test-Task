@@ -9,13 +9,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.dash.DashMediaSource
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.my.sweettvtesttask.R
 import com.my.sweettvtesttask.databinding.ActivityVideoPlayerBinding
 import com.my.sweettvtesttask.domain.response.VideoResponse
@@ -58,16 +58,21 @@ class VideoPlayerActivity : AppCompatActivity() {
     }
 
     private fun setUpPlayer(videos: List<VideoResponse>?, selectedPosition: Int?) {
-        if (videos == null) {
-            showError()
-            return
-        }
-        player = ExoPlayer.Builder(this).build()
+        val trackSelector = DefaultTrackSelector(this)
+        player = ExoPlayer.Builder(this).setTrackSelector(trackSelector).build()
         binding.playerView.player = player
+        val currentParameters = player.trackSelectionParameters
+        val newParameters = currentParameters
+            .buildUpon()
+            .setMaxVideoSizeSd()
+            .setViewportSizeToPhysicalDisplaySize(this, false)
+            .build()
+        player.trackSelectionParameters = newParameters
         player.setMediaSources(
-            createMediaSourcesList(videos),
+            createMediaSourcesList(videos ?: return showError()),
             selectedPosition ?: 0,
-            0L)
+            0L
+        )
         player.prepare()
         player.play()
     }
@@ -76,32 +81,38 @@ class VideoPlayerActivity : AppCompatActivity() {
         val mediaSources = mutableListOf<MediaSource>()
         videos.forEach { video ->
             val mimeType = getMimeType(video.videoUrl)
-            val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
-            val mediaItem =
-                MediaItem.Builder()
-                    .setUri(video.videoUrl)
-                    .setDrmConfiguration(
-                        MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
-                            .setLicenseUri(video.drmLicenseUrl)
-                            .setMultiSession(true)
-                            .build()
-                    )
-                    .setMimeType(mimeType)
-                    .build()
-            val mediaSource: MediaSource =
-                when (video.type) {
-                    VideoType.DASH -> DashMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(mediaItem)
-
-                    VideoType.HLS -> HlsMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(mediaItem)
-
-                    else -> ProgressiveMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(mediaItem)
-                }
-            mediaSources.add(mediaSource)
+            val newMediaItem = getMediaItem(video, mimeType)
+            val newMediaSource = getMediaSource(video.type, newMediaItem)
+            mediaSources.add(newMediaSource)
         }
         return mediaSources
+    }
+
+    private fun getMediaItem(video: VideoResponse, mimeType: String?): MediaItem {
+        return MediaItem.Builder()
+            .setUri(video.videoUrl)
+            .setDrmConfiguration(
+                MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                    .setLicenseUri(video.drmLicenseUrl)
+                    .setMultiSession(true)
+                    .build()
+            )
+            .setMimeType(mimeType)
+            .build()
+    }
+
+    private fun getMediaSource(videoType: VideoType, mediaItem: MediaItem): MediaSource {
+        val dataSourceFactory = DefaultHttpDataSource.Factory()
+        return when (videoType) {
+            VideoType.DASH -> DashMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(mediaItem)
+
+            VideoType.HLS -> HlsMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(mediaItem)
+
+            else -> ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(mediaItem)
+        }
     }
 
     private fun getMimeType(url: String?): String? {
@@ -113,11 +124,16 @@ class VideoPlayerActivity : AppCompatActivity() {
         return type
     }
 
-    override fun onStop() {
+    override fun onPause() {
+        player.pause()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
         window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         player.stop()
         player.clearMediaItems()
-        super.onStop()
+        super.onDestroy()
     }
 
 }

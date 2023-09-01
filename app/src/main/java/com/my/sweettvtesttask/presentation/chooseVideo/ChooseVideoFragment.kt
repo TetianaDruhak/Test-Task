@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.my.sweettvtesttask.R
 import com.my.sweettvtesttask.databinding.FragmentChooseVideoBinding
 import com.my.sweettvtesttask.domain.response.VideoResponse
+import com.my.sweettvtesttask.presentation.HomeActivity
 import com.my.sweettvtesttask.presentation.HomeViewModel
 import com.my.sweettvtesttask.utils.Res
 
@@ -29,7 +30,7 @@ class ChooseVideoFragment : Fragment(), VideoAdapter.Callback {
     private val viewModel: HomeViewModel by activityViewModels()
     private val videoAdapter = VideoAdapter(this)
 
-    val bundle = Bundle()
+    private val bundle = Bundle()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,14 +39,15 @@ class ChooseVideoFragment : Fragment(), VideoAdapter.Callback {
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
         binding = FragmentChooseVideoBinding.inflate(layoutInflater)
+        (activity as HomeActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        (activity as HomeActivity).supportActionBar?.setDisplayShowHomeEnabled(true)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val categoryAlias = args.categoryAlias
-        binding.tvTitle.text =
-            resources.getString(R.string.choose_video_from) + args.categoryName
+        (activity as HomeActivity).supportActionBar?.title = args.categoryName
         viewModel.loadVideos(requireContext(), categoryAlias)
         viewModel.getVideos().observe(viewLifecycleOwner) {
             when (it) {

@@ -11,10 +11,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import com.my.sweettvtesttask.R
 import com.my.sweettvtesttask.databinding.FragmentChooseCategoryBinding
 import com.my.sweettvtesttask.domain.response.CategoryResponse
+import com.my.sweettvtesttask.presentation.HomeActivity
 import com.my.sweettvtesttask.presentation.HomeViewModel
-import com.my.sweettvtesttask.presentation.chooseVideo.VIDEO_DATA
 import com.my.sweettvtesttask.utils.Res
 
 class ChooseCategoryFragment : Fragment(), CategoriesAdapter.Callback {
@@ -31,6 +32,10 @@ class ChooseCategoryFragment : Fragment(), CategoriesAdapter.Callback {
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
         binding = FragmentChooseCategoryBinding.inflate(layoutInflater)
+        (activity as HomeActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        (activity as HomeActivity).supportActionBar?.setDisplayShowHomeEnabled(false)
+        (activity as HomeActivity).supportActionBar?.title =
+            resources.getString(R.string.please_choose_category)
         return binding.root
     }
 
