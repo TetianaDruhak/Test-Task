@@ -21,7 +21,7 @@
             android:exported="false"
             android:screenOrientation="landscape"
             android:label="@string/title_activity_video_player"
-            android:theme="@style/Theme.SweetTVTestTask" />
+            android:theme="@style/SweetTVTestTask.Player" />
         <activity
             android:name=".presentation.HomeActivity"
             android:exported="true">
